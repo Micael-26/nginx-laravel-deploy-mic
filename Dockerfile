@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copier les fichiers du projet
-COPY . .
+COPY . . 
 
 # Copier les assets compilés depuis l'étape Node
 COPY --from=node /var/www/html/public/build ./public/build
@@ -55,7 +55,7 @@ RUN { \
 # Étape 3 : Image finale avec Nginx + PHP-FPM
 FROM alpine:3.18
 
-# Installer Nginx, PHP-FPM et supervisord
+# Installer Nginx, PHP-FPM, supervisord, et bash
 RUN apk add --no-cache \
     nginx \
     php82 \
@@ -66,7 +66,8 @@ RUN apk add --no-cache \
     php82-pdo_mysql \
     php82-gd \
     php82-zip \
-    supervisor
+    supervisor \
+    bash  # Installer bash ici si vous avez besoin de bash
 
 # Configurer les répertoires nécessaires
 RUN mkdir -p /var/www/html && \
