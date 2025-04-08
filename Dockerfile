@@ -41,11 +41,7 @@ COPY --from=node /var/www/html/public/build ./public/build
 # Installer les dépendances Composer (production uniquement)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Configurer les permissions pour les fichiers log PHP
-RUN mkdir -p /var/log/php82 && \
-    chown -R www-data:www-data /var/log/php82
-
-# Configurer les permissions
+# Configurer les permissions sur les répertoires de stockage et cache
 RUN chown -R www-data:www-data /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache
 
@@ -59,7 +55,7 @@ RUN { \
 # Étape 3 : Image finale avec Nginx + PHP-FPM
 FROM alpine:3.18
 
-# Installer Nginx et PHP-FPM
+# Installer Nginx, PHP-FPM et supervisord
 RUN apk add --no-cache \
     nginx \
     php82 \
@@ -72,13 +68,14 @@ RUN apk add --no-cache \
     php82-zip \
     supervisor
 
-# Configurer Nginx et PHP-FPM
+# Configurer les répertoires nécessaires
 RUN mkdir -p /var/www/html && \
     mkdir -p /run/nginx && \
     mkdir -p /run/php && \
+    mkdir -p /var/log/php82 && \
     rm /etc/nginx/http.d/default.conf
 
-# Copier la configuration
+# Copier la configuration de Nginx et supervisord
 COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
 COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
@@ -86,9 +83,10 @@ COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 WORKDIR /var/www/html
 COPY --from=php /var/www/html .
 
-# Configurer les permissions
+# Configurer les permissions sur les répertoires de stockage et cache
 RUN chown -R nginx:nginx /var/www/html/storage \
-    && chown -R nginx:nginx /var/www/html/bootstrap/cache
+    && chown -R nginx:nginx /var/www/html/bootstrap/cache \
+    && chown -R nginx:nginx /var/log/php82
 
 # Exposer le port 8080 (Render utilise ce port par défaut)
 EXPOSE 8080
