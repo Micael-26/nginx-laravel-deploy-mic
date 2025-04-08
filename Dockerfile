@@ -2,7 +2,7 @@
 FROM node:20 as node
 
 WORKDIR /var/www/html
-COPY package.json vite.config.js ./
+COPY package.json vite.config.js ./ 
 COPY resources ./resources
 
 RUN npm install && npm run build
@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copier les fichiers du projet (sauf node_modules, etc.)
-COPY . .
+COPY . . 
 COPY --from=node /var/www/html/public/build ./public/build
 
 # Installer les dépendances Composer (production uniquement)
@@ -61,5 +61,5 @@ COPY --from=php /var/www/html .
 # Exposer le port 8080 (Render utilise ce port par défaut)
 EXPOSE 8080
 
-# Démarrer Nginx et PHP-FPM
-CMD ["sh", "-c", "php-fpm -D && nginx -g 'daemon off;'"]
+# Démarrer PHP-FPM et Nginx (assurez-vous que les deux processus s'exécutent correctement)
+CMD ["sh", "-c", "php-fpm && nginx -g 'daemon off;'"]
