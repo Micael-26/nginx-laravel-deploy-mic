@@ -2,7 +2,7 @@
 FROM node:20 as node
 
 WORKDIR /var/www/html
-COPY package.json vite.config.js ./ 
+COPY package.json vite.config.js ./
 COPY resources ./resources
 
 RUN npm install && npm run build
@@ -32,8 +32,10 @@ RUN apt-get update && apt-get install -y \
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copier les fichiers du projet (sauf node_modules, etc.)
-COPY . . 
+# Copier les fichiers du projet
+COPY . .
+
+# Copier les assets compilés depuis l'étape Node
 COPY --from=node /var/www/html/public/build ./public/build
 
 # Installer les dépendances Composer (production uniquement)
@@ -44,22 +46,48 @@ RUN chown -R www-data:www-data /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 # Configurer OPcache pour la production
-RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.memory_consumption=256" >> /usr/local/etc/php/conf.d/opcache.ini \
-    && echo "opcache.interned_strings_buffer=32" >> /usr/local/etc/php/conf.d/opcache.ini
+RUN { \
+    echo "opcache.enable=1"; \
+    echo "opcache.memory_consumption=256"; \
+    echo "opcache.interned_strings_buffer=32"; \
+    } > /usr/local/etc/php/conf.d/opcache.ini
 
-# Étape 3 : Nginx
-FROM nginx:alpine
+# Étape 3 : Image finale avec Nginx + PHP-FPM
+FROM alpine:3.18
 
-# Copier la configuration Nginx
-COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
+# Installer Nginx et PHP-FPM
+RUN apk add --no-cache \
+    nginx \
+    php82 \
+    php82-fpm \
+    php82-opcache \
+    php82-mbstring \
+    php82-pdo \
+    php82-pdo_mysql \
+    php82-gd \
+    php82-zip \
+    supervisor
+
+# Configurer Nginx et PHP-FPM
+RUN mkdir -p /var/www/html && \
+    mkdir -p /run/nginx && \
+    mkdir -p /run/php && \
+    rm /etc/nginx/http.d/default.conf
+
+# Copier la configuration
+COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
+COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Copier les fichiers depuis le builder PHP
 WORKDIR /var/www/html
 COPY --from=php /var/www/html .
 
+# Configurer les permissions
+RUN chown -R nginx:nginx /var/www/html/storage \
+    && chown -R nginx:nginx /var/www/html/bootstrap/cache
+
 # Exposer le port 8080 (Render utilise ce port par défaut)
 EXPOSE 8080
 
-# Démarrer PHP-FPM et Nginx (assurez-vous que les deux processus s'exécutent correctement)
-CMD ["sh", "-c", "php-fpm && nginx -g 'daemon off;'"]
+# Démarrer les services avec Supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
