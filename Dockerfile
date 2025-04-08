@@ -2,7 +2,7 @@
 FROM node:20 as node
 
 WORKDIR /var/www/html
-COPY package.json vite.config.js ./
+COPY package.json vite.config.js ./ 
 COPY resources ./resources
 
 RUN npm install && npm run build
@@ -40,6 +40,10 @@ COPY --from=node /var/www/html/public/build ./public/build
 
 # Installer les dépendances Composer (production uniquement)
 RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Configurer les permissions pour les fichiers log PHP
+RUN mkdir -p /var/log/php82 && \
+    chown -R www-data:www-data /var/log/php82
 
 # Configurer les permissions
 RUN chown -R www-data:www-data /var/www/html/storage \
