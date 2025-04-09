@@ -29,9 +29,6 @@ COPY . .
 # Installe les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Génére la clé de l'application (à condition que .env existe déjà)
-RUN php artisan key:generate || true
-
 # Donne les bons droits d'accès
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 storage bootstrap/cache
