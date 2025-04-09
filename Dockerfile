@@ -1,7 +1,7 @@
-# Utilisez une image PHP avec FPM
+# Étape 1: Base PHP-FPM
 FROM php:8.2-fpm
 
-# Installer les dépendances système
+# Étape 2: Installer les dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -13,35 +13,37 @@ RUN apt-get update && apt-get install -y \
     nginx \
     supervisor
 
-# Installer les extensions PHP nécessaires
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Étape 3: Installer les extensions PHP
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
-# Installer Composer
+# Étape 4: Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Créer le répertoire de l'application
+# Étape 5: Configurer le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier les fichiers de l'application
+# Étape 6: Copier les fichiers de l'application
 COPY . .
 
-# Installer les dépendances Composer (sans les dépendances de développement pour la production)
+# Étape 7: Installer les dépendances (production)
 RUN composer install --optimize-autoloader --no-dev
 
-# Configurer les permissions
-RUN chown -R www-data:www-data /var/www/html/storage
-RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
-RUN chmod -R 775 /var/www/html/storage
-RUN chmod -R 775 /var/www/html/bootstrap/cache
+# Étape 8: Configurer les permissions
+RUN chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
 
-# Copier la configuration Nginx
+RUN chmod -R 775 \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
+
+# Étape 9: Copier les configurations
 COPY deploy/nginx.conf /etc/nginx/sites-available/default
-
-# Copier la configuration Supervisor
+COPY deploy/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Exposer le port 80
+# Étape 11: Exposer le port 80
 EXPOSE 80
 
-# Lancer Supervisor
+# Étape 12: Lancer Supervisor
 CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
