@@ -1,90 +1,77 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Article de Blog Moderne</title>
-    <!-- CDN Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- CDN Font Awesome pour les icônes -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Article de Blog Moderne</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts (Exemple avec 'Roboto') -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome pour les icônes sociales -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 font-roboto">
 
-    <!-- Container principal -->
-    <div class="max-w-4xl mx-auto my-10 p-6 bg-white shadow-lg rounded-lg">
+  <div class="max-w-4xl mx-auto my-12 p-8 bg-white shadow-lg rounded-lg">
 
-        <!-- Titre de l'article -->
-        <h1 class="text-4xl font-semibold text-gray-900 mb-4">Titre de l'article captivant</h1>
+    <!-- Titre de l'article -->
+    <h1 class="text-4xl font-bold text-gray-800 mb-4">Titre de l'Article Moderne</h1>
 
-        <!-- Métadonnées de l'article -->
-        <div class="flex items-center text-sm text-gray-500 mb-6">
-            <span>Publié le <strong>10 avril 2025</strong></span>
-            <span class="mx-2">|</span>
-            <span>Par <strong>Auteur Nom</strong></span>
-            <span class="mx-2">|</span>
-            <span><i class="fas fa-tags"></i> Catégorie</span>
-        </div>
-
-        <!-- Contenu principal -->
-        <div class="prose lg:prose-xl text-gray-700">
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tincidunt ligula vel orci tempor tincidunt. Donec scelerisque nisi ut urna lacinia, non scelerisque tortor eleifend.</p>
-
-            <h2 class="text-2xl font-semibold text-gray-900 mt-8 mb-4">Sous-titre captivant</h2>
-            <p>Nullam faucibus, eros non vulputate pharetra, justo nulla ultricies metus, et egestas magna velit vel ante. Ut fringilla velit eget nisl gravida, in aliquet odio interdum.</p>
-
-            <blockquote class="border-l-4 border-indigo-500 pl-4 italic my-6 text-gray-600">
-                “Un passage marquant du contenu pour attirer l'attention du lecteur.”
-            </blockquote>
-
-            <p>Proin laoreet quam eu maximus aliquet. Aenean ac felis non elit gravida scelerisque. Maecenas non arcu malesuada, tristique orci eget, dictum tortor. Integer fermentum neque et dolor tempor, in scelerisque arcu dignissim.</p>
-
-            <!-- Image dans l'article -->
-            <div class="my-6">
-                <img src="https://via.placeholder.com/1200x600" alt="Image d'illustration" class="w-full h-auto rounded-lg shadow-md">
-            </div>
-
-            <p>Morbi nec ante sit amet purus convallis laoreet et et mi. Curabitur convallis felis at dolor egestas, ac scelerisque velit porttitor. Fusce maximus dui vitae orci efficitur, a auctor ante vulputate.</p>
-
-            <!-- Liens utiles -->
-            <ul class="list-disc pl-5 my-6">
-                <li><a href="#" class="text-indigo-600 hover:underline">Lien vers un autre article</a></li>
-                <li><a href="#" class="text-indigo-600 hover:underline">Lien vers un article externe</a></li>
-            </ul>
-
-            <p>Donec nec velit nisl. Integer vel ligula eu purus sollicitudin vehicula. Mauris auctor diam ut risus consectetur, id volutpat libero aliquet.</p>
-        </div>
-
-        <!-- Footer de l'article -->
-        <div class="mt-10">
-            <hr class="border-t-2 border-gray-300">
-            <div class="flex justify-between items-center mt-4">
-                <button class="px-6 py-2 bg-indigo-600 text-white rounded-full shadow-md hover:bg-indigo-700 focus:outline-none">
-                    Lire plus
-                </button>
-                <div class="flex items-center">
-                    <span class="mr-3 text-sm">Partager sur :</span>
-                    <a href="#" class="text-blue-600 mx-2">
-                        <i class="fab fa-facebook-square"></i>
-                    </a>
-                    <a href="#" class="text-blue-400 mx-2">
-                        <i class="fab fa-twitter-square"></i>
-                    </a>
-                    <a href="#" class="text-gray-700 mx-2">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-
+    <!-- Auteur et date -->
+    <div class="text-sm text-gray-500 mb-6">
+      <span class="font-semibold">Par Jean Dupont</span> - <span>1er avril 2025</span>
     </div>
+
+    <!-- Image de couverture -->
+    <img src="https://via.placeholder.com/1200x500" alt="Image de couverture" class="w-full h-72 object-cover rounded-lg mb-6">
+
+    <!-- Contenu de l'article -->
+    <div class="text-lg text-gray-700 space-y-6">
+
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur interdum leo ac lorem cursus, nec aliquet libero mollis. Integer nec ultricies purus. Curabitur nec lorem feugiat, porttitor libero nec, pharetra purus. Vivamus vehicula purus in nulla consequat pharetra. Fusce non enim sit amet nisi posuere aliquet. Aenean quis lacinia lorem. Donec ut urna eget erat lacinia efficitur id id nunc. Cras id erat sapien.</p>
+
+      <h2 class="text-2xl font-semibold text-gray-800 mt-6 mb-4">Sous-titre important</h2>
+
+      <p>Morbi tincidunt orci eu felis dictum, ac convallis sapien tempus. Nam in justo sem. Proin consequat, libero ut varius auctor, nunc purus egestas turpis, vel laoreet risus leo in nisl. Cras efficitur lectus vel velit euismod, at rutrum ipsum efficitur.</p>
+
+      <!-- Citation -->
+      <blockquote class="bg-gray-100 border-l-4 border-gray-600 p-4 italic text-gray-600 my-6">
+        "La créativité, c’est l’intelligence qui s’amuse." - Albert Einstein
+      </blockquote>
+
+      <p>Fusce suscipit massa nec lectus dictum, sit amet lobortis enim malesuada. Nam vel dolor eget nisl posuere tristique sit amet id nunc. Etiam venenatis mollis odio. Vivamus sollicitudin risus turpis, at malesuada magna placerat sed.</p>
+
+      <!-- Liste à puces -->
+      <ul class="list-disc pl-6 text-gray-700">
+        <li>Point important 1</li>
+        <li>Point important 2</li>
+        <li>Point important 3</li>
+      </ul>
+
+      <p>Aliquam ac est ut libero facilisis interdum at in odio. Phasellus dictum erat sed felis ultricies suscipit. Cras maximus, lorem vel condimentum mollis, est leo placerat sem, et feugiat erat velit ut turpis.</p>
+
+      <!-- Bouton de partage sur les réseaux sociaux -->
+      <div class="mt-8">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Partager cet article</h3>
+        <div class="flex space-x-4">
+          <a href="#" class="text-blue-500 hover:text-blue-700">
+            <i class="fab fa-facebook-square text-3xl"></i>
+          </a>
+          <a href="#" class="text-blue-400 hover:text-blue-600">
+            <i class="fab fa-twitter-square text-3xl"></i>
+          </a>
+          <a href="#" class="text-red-500 hover:text-red-700">
+            <i class="fab fa-google-plus-square text-3xl"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
 
 </body>
 </html>
