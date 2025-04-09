@@ -1,96 +1,47 @@
-# Étape 1 : Builder les assets frontend (Node.js)
-FROM node:20 as node
+# Utilisez une image PHP avec FPM
+FROM php:8.2-fpm
 
-WORKDIR /var/www/html
-COPY package.json vite.config.js ./ 
-COPY resources ./resources
-
-RUN npm install && npm run build
-
-# Étape 2 : Builder PHP et installer les dépendances
-FROM php:8.4-fpm as php
-
-WORKDIR /var/www/html
-
-# Installer les dépendances système et extensions PHP
+# Installer les dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
-    libwebp-dev \
-    libjpeg-dev \
-    libzip-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
     unzip \
-    && docker-php-ext-configure gd --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) \
-        pdo \
-        pdo_mysql \
-        gd \
-        zip \
-        opcache
+    nginx \
+    supervisor
+
+# Installer les extensions PHP nécessaires
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Installer Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copier les fichiers du projet
-COPY . . 
+# Créer le répertoire de l'application
+WORKDIR /var/www/html
 
-# Copier les assets compilés depuis l'étape Node
-COPY --from=node /var/www/html/public/build ./public/build
+# Copier les fichiers de l'application
+COPY . .
 
-# Installer les dépendances Composer (production uniquement)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Installer les dépendances Composer (sans les dépendances de développement pour la production)
+RUN composer install --optimize-autoloader --no-dev
 
-# Configurer les permissions sur les répertoires de stockage et cache
-RUN chown -R www-data:www-data /var/www/html/storage \
-    && chown -R www-data:www-data /var/www/html/bootstrap/cache
+# Configurer les permissions
+RUN chown -R www-data:www-data /var/www/html/storage
+RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
+RUN chmod -R 775 /var/www/html/storage
+RUN chmod -R 775 /var/www/html/bootstrap/cache
 
-# Configurer OPcache pour la production
-RUN { \
-    echo "opcache.enable=1"; \
-    echo "opcache.memory_consumption=256"; \
-    echo "opcache.interned_strings_buffer=32"; \
-    } > /usr/local/etc/php/conf.d/opcache.ini
+# Copier la configuration Nginx
+COPY deploy/nginx.conf /etc/nginx/sites-available/default
 
-# Étape 3 : Image finale avec Nginx + PHP-FPM
-FROM alpine:3.18
-
-# Installer Nginx, PHP-FPM, supervisord, et bash
-RUN apk add --no-cache \
-    nginx \
-    php82 \
-    php82-fpm \
-    php82-opcache \
-    php82-mbstring \
-    php82-pdo \
-    php82-pdo_mysql \
-    php82-gd \
-    php82-zip \
-    supervisor \
-    bash  # Installer bash ici si vous avez besoin de bash
-
-# Configurer les répertoires nécessaires
-RUN mkdir -p /var/www/html && \
-    mkdir -p /run/nginx && \
-    mkdir -p /run/php && \
-    mkdir -p /var/log/php82 && \
-    rm /etc/nginx/http.d/default.conf
-
-# Copier la configuration de Nginx et supervisord
-COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
+# Copier la configuration Supervisor
 COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Copier les fichiers depuis le builder PHP
-WORKDIR /var/www/html
-COPY --from=php /var/www/html .
+# Exposer le port 80
+EXPOSE 80
 
-# Configurer les permissions sur les répertoires de stockage et cache
-RUN chown -R nginx:nginx /var/www/html/storage \
-    && chown -R nginx:nginx /var/www/html/bootstrap/cache \
-    && chown -R nginx:nginx /var/log/php82
-
-# Exposer le port 8080 (Render utilise ce port par défaut)
-EXPOSE 8080
-
-# Démarrer les services avec Supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Lancer Supervisor
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
