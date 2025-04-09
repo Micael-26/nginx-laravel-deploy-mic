@@ -20,12 +20,21 @@ RUN apt-get update && apt-get install -y \
 # Installe Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copie le projet Laravel
-COPY . /var/www
-
-# Donne les bons droits
+# Crée le dossier de travail
 WORKDIR /var/www
-RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
+
+# Copie le projet Laravel
+COPY . .
+
+# Installe les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader
+
+# Génére la clé de l'application (à condition que .env existe déjà)
+RUN php artisan key:generate || true
+
+# Donne les bons droits d'accès
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache
 
 # Supprime la configuration nginx par défaut et ajoute la tienne
 COPY nginx.conf /etc/nginx/nginx.conf
@@ -33,6 +42,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Configuration supervisord pour lancer PHP-FPM + Nginx ensemble
 COPY supervisord.conf /etc/supervisord.conf
 
+# Expose le port HTTP
 EXPOSE 80
 
+# Lance supervisord
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
