@@ -1,8 +1,9 @@
 FROM php:8.3-fpm
 
-# Installe les dépendances système
+# Installer les dépendances système (y compris libpq-dev pour PostgreSQL)
 RUN apt-get update && apt-get install -y \
     build-essential \
+    libpq-dev \  # Pour PostgreSQL
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
@@ -15,7 +16,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     nginx \
     supervisor \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip \
+    && rm -rf /var/lib/apt/lists/*  # Nettoyage après l'installation pour réduire la taille de l'image
 
 # Installe Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -26,16 +28,16 @@ WORKDIR /var/www
 # Copie le projet Laravel
 COPY . .
 
-# Installe les dépendances PHP
+# Installe les dépendances PHP via Composer
 RUN composer install --no-dev --optimize-autoloader
 
 # Donne les bons droits d'accès
-RUN chown -R www-data:www-data /var/www \  
-    && find /var/www -type d -exec chmod 755 {} \; \  
-    && find /var/www -type f -exec chmod 644 {} \; \  
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \  
+RUN chown -R www-data:www-data /var/www \
+    && find /var/www -type d -exec chmod 755 {} \; \
+    && find /var/www -type f -exec chmod 644 {} \; \
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \
     && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
-    
+
 # Supprime la configuration nginx par défaut et ajoute la tienne
 COPY nginx.conf /etc/nginx/nginx.conf
 
