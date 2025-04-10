@@ -30,9 +30,12 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Donne les bons droits d'accès
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 775 storage bootstrap/cache
-
+RUN chown -R www-data:www-data /var/www \  
+    && find /var/www -type d -exec chmod 755 {} \; \  
+    && find /var/www -type f -exec chmod 644 {} \; \  
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \  
+    && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
+    
 # Supprime la configuration nginx par défaut et ajoute la tienne
 COPY nginx.conf /etc/nginx/nginx.conf
 
