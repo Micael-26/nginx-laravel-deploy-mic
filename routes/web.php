@@ -7,5 +7,8 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function () {
-    return "Ma route fonctionne !";
+    return response()->json([
+        'message' => 'Laravel est opérationnel !',
+        'routes' => Route::getRoutes()->getRoutesByName()
+    ]);
 });
