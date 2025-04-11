@@ -4,7 +4,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('portfolio');
+    return view('welcome');
+});
+
+Route::get('/portfolio', function () {
+    return view('welcome');
 });
 
 Route::get('/health', function () {
