@@ -61,7 +61,7 @@ Le projet utilise Render comme fournisseur cloud pour exécuter l’application 
 
 ## Accès
 
-➡️ Application en ligne : [https://laravel-docker-deploy.onrender.com](https://laravel-docker-deploy.onrender.com)
+[![Live Deployment](https://img.shields.io/badge/LIVE_DEMO-▶_laravel--docker--deploy.onrender.com-46E3B7?style=for-the-badge)](https://laravel-docker-deploy.onrender.com)
 
 Merci d’avoir suivi cette évolution jusqu’en production !
 
