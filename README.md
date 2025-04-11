@@ -1,6 +1,6 @@
-# Déploiement réussi de mon application Laravel sur Render via Docker
+# Déploiement l'application Laravel 12 sur Render via Docker
 
-Je suis heureux d’annoncer que le déploiement de mon application Laravel a été effectué avec succès sur la plateforme **Render** en utilisant **Docker**. Cette mise en production marque une étape clé dans le cycle de développement et confirme que l’environnement de production est prêt pour accueillir des utilisateurs.
+Je suis heureux d’annoncer que le déploiement de mon application Laravel a été effectué avec succès sur la plateforme **Render** en utilisant **Docker**. Cette mise en production marque une étape clé dans le cycle de développement et confirme que l’environnement de production est prêt pour demarer en ligne.
 
 ---
 
@@ -10,9 +10,7 @@ Je suis heureux d’annoncer que le déploiement de mon application Laravel a é
 - **PostgreSQL** (base de données)
 - **Docker** (conteneurisation)
 - **Render** (hébergement cloud)
-- **Tailwind CSS / Bootstrap** (frontend stylisé)
-- **Node.js & Laravel Mix** (compilation des assets)
-
+  
 ---
 
 ## Environnement de production
