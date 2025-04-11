@@ -44,8 +44,15 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # Configuration supervisord pour lancer PHP-FPM + Nginx ensemble
 COPY supervisord.conf /etc/supervisord.conf
 
+# Copie de entrypoint.sh dans l'image Docker
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Rendre le script exécutable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Expose le port HTTP
 EXPOSE 80
 
-# Lance supervisord
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Utilise le script comme point d’entrée
+CMD ["sh", "/usr/local/bin/entrypoint.sh"]
+
