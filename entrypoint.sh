@@ -9,19 +9,17 @@ if [ -z "$DATABASE_URL" ]; then
   exit 1
 fi
 
-# Extraire les parties de DATABASE_URL
-
-# Utilisation de regex pour décomposer l'URL
-DB_HOST=$(echo $DATABASE_URL | sed -E 's|^postgres://([^:]+):.*|\1|')
-DB_PORT=$(echo $DATABASE_URL | sed -E 's|^postgres://[^:]+:([^@]+).*|\1|')
-DB_USERNAME=$(echo $DATABASE_URL | sed -E 's|^postgres://([^:]+):([^@]+)@.*|\1|')
-DB_PASSWORD=$(echo $DATABASE_URL | sed -E 's|^postgres://[^:]+:([^@]+)@.*|\1|')
-DB_DATABASE=$(echo $DATABASE_URL | sed -E 's|^postgres://[^:]+:[^@]+@[^/]+/(.*)|\1|')
+# Extraire les parties de DATABASE_URL de manière plus robuste
+DB_USERNAME=$(echo $DATABASE_URL | awk -F'[:/@]' '{print $4}')
+DB_PASSWORD=$(echo $DATABASE_URL | awk -F'[:/@]' '{print $5}')
+DB_HOST=$(echo $DATABASE_URL | awk -F'[:/@]' '{print $6}')
+DB_PORT=$(echo $DATABASE_URL | awk -F'[:/@]' '{print $7}')
+DB_DATABASE=$(echo $DATABASE_URL | awk -F'/' '{print $NF}')
 
 echo "⏳ Attente que PostgreSQL soit prêt..."
 
 # Attente jusqu'à ce que la base de données PostgreSQL soit prête
-until psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USERNAME" -d "$DB_DATABASE" -c '\q' 2>/dev/null; do
+until PGPASSWORD=$DB_PASSWORD psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USERNAME" -d "$DB_DATABASE" -c '\q' 2>/dev/null; do
   echo "⏳ PostgreSQL non prêt encore - attente..."
   sleep 2
 done
