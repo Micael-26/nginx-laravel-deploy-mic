@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-# 1. Installer les dépendances système + extensions PHP
+# 1. Installer les dépendances système + extensions PHP + dos2unix
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     nginx \
     supervisor \
+    dos2unix \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip \
     && rm -rf /var/lib/apt/lists/*
