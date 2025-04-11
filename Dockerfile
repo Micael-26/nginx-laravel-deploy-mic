@@ -3,11 +3,19 @@ FROM node:20 AS frontend-builder
 
 WORKDIR /app
 
-# 1. Installer les dépendances frontend
-COPY package.json package-lock.json ./
-RUN npm install --legacy-peer-deps && npm cache clean --force
+# 1. Copier les fichiers de dépendances (gère l'absence de package-lock.json)
+COPY package.json .
+COPY package-lock.json* ./
 
-# 2. Builder les assets
+# 2. Installer les dépendances frontend (avec gestion d'erreur)
+RUN if [ -f package-lock.json ]; then \
+      npm ci --legacy-peer-deps; \
+    else \
+      npm install --legacy-peer-deps; \
+    fi \
+    && npm cache clean --force
+
+# 3. Builder les assets
 COPY resources/ ./resources/
 COPY vite.config.js ./
 RUN npm run build
@@ -51,7 +59,7 @@ RUN chown -R www-data:www-data /var/www \
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# 7. Configurer l'entrypoint (conversion des fins de ligne)
+# 7. Configurer l'entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/
 RUN apk add --no-cache dos2unix \
     && dos2unix /usr/local/bin/entrypoint.sh \
