@@ -8,7 +8,7 @@ Route::get('/', function () {
 });
 
 Route::get('/portfolio', function () {
-    return view('welcome');
+    return view('portfolio');
 });
 
 Route::get('/health', function () {
