@@ -38,7 +38,7 @@ RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \
     && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
 
-# Supprime la configuration nginx par défaut et ajoute la tienne
+# Supprime la configuration nginx par défaut
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Configuration supervisord pour lancer PHP-FPM + Nginx ensemble
@@ -55,4 +55,3 @@ EXPOSE 80
 
 # Utilise le script comme point d’entrée
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]
-
