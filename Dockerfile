@@ -1,73 +1,61 @@
-FROM php:8.3-fpm
+# ========== ÉTAPE DE BUILD ==========
+FROM node:20 AS frontend-builder
 
-# 1. Installer les dépendances système + extensions PHP + dos2unix
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim unzip git curl \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    nginx \
-    supervisor \
-    dos2unix \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# 2. Installer Node.js (LTS) avec vérification
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && node -v \
-    && npm -v \
-    && npm install -g npm@latest
+# 1. Installer les dépendances frontend
+COPY package.json package-lock.json ./
+RUN npm install --legacy-peer-deps && npm cache clean --force
 
-# 3. Étape frontend sécurisée
-WORKDIR /var/www
-
-# 3.1 Copie séparée pour meilleur cache
-COPY package.json package-lock.json* ./
-
-# 3.2 Installation avec gestion d'erreur
-RUN npm install --legacy-peer-deps || \
-    (echo "Fallback: clean node_modules and retry..." && rm -rf node_modules/ && npm install --legacy-peer-deps) \
-    && npm cache clean --force
-
-# 3.3 Build avec variables nécessaires
-ENV NODE_ENV=production
+# 2. Builder les assets
 COPY resources/ ./resources/
 COPY vite.config.js ./
-RUN npm run build || \
-    (echo "Build failed - retrying..." && npm rebuild && npm run build)
+RUN npm run build
 
-# 4. Backend PHP
+# ========== ÉTAPE DE PRODUCTION ==========
+FROM php:8.3-fpm-alpine
+
+# 1. Installer les dépendances système minimales
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    oniguruma-dev \
+    postgresql-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
+
+# 2. Configurer l'environnement
+WORKDIR /var/www
+ENV NODE_ENV=production
+ENV APP_ENV=production
+
+# 3. Copier les assets compilés depuis l'étape frontend
+COPY --from=frontend-builder /app/public/build/ ./public/build/
+
+# 4. Installer les dépendances PHP
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 COPY . .
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 4.1 Installation Composer sécurisée
-RUN composer install --no-dev --optimize-autoloader --no-interaction || \
-    (rm -rf vendor/ && composer install --no-dev --optimize-autoloader --no-interaction)
-
-# 5. Permissions (ajustées pour éviter les conflits)
+# 5. Configurer les permissions
 RUN chown -R www-data:www-data /var/www \
     && find /var/www -type d -exec chmod 755 {} \; \
     && find /var/www -type f -exec chmod 644 {} \; \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache
 
-# 6. Configuration serveur
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY supervisord.conf /etc/supervisord.conf
+# 6. Configurer les services
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
 
-# 7. Entrypoint robuste
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh \
-    && dos2unix /usr/local/bin/entrypoint.sh
+# 7. Configurer l'entrypoint (conversion des fins de ligne)
+COPY docker/entrypoint.sh /usr/local/bin/
+RUN apk add --no-cache dos2unix \
+    && dos2unix /usr/local/bin/entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.sh
 
 EXPOSE 80
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]
