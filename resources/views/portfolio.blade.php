@@ -37,7 +37,7 @@
             <div class="flex justify-between h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="#accueil" class="text-xl font-bold gradient-text">[Micael DINY]</a>
+                    <a href="#accueil" class="text-xl font-bold gradient-text">Micael DINY</a>
                 </div>
                 
                 <!-- Menu desktop -->
@@ -76,10 +76,10 @@
             <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
                 <div class="space-y-6">
                     <h1 class="text-4xl md:text-5xl font-bold text-gray-900 leading-tight">
-                        Bonjour, je suis <span class="gradient-text">[Micael DINY]</span>
+                        Bonjour, je suis <span class="gradient-text">Micael DINY</span>
                     </h1>
                     <h2 class="text-2xl md:text-3xl text-gray-600">
-                        <span class="inline-block mr-2">👨‍💻</span> Développeur Full-Stack
+                        <span class="inline-block mr-2"> </span> Développeur Full-Stack
                     </h2>
                     <p class="text-lg text-gray-500">
                         Je crée des applications web modernes et performantes avec Laravel, Vue.js et Tailwind CSS.
@@ -331,7 +331,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="grid md:grid-cols-3 gap-8">
                 <div>
-                    <h3 class="text-xl font-bold mb-4">[Votre Nom]</h3>
+                    <h3 class="text-xl font-bold mb-4">Micael DINY</h3>
                     <p class="text-gray-400">Développeur Full-Stack passionné par la création d'applications web modernes et performantes.</p>
                 </div>
                 
@@ -358,7 +358,7 @@
             </div>
             
             <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-                <p>&copy; {{ date('Y') }} [Micael DINY]. Tous droits réservés.</p>
+                <p>&copy; {{ date('Y') }} Micael DINY. Tous droits réservés.</p>
             </div>
         </div>
     </footer>
