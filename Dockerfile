@@ -1,57 +1,51 @@
+# Étape 1 : Builder les assets frontend (Node.js)
+FROM node:18 AS frontend-builder
+
+WORKDIR /var/www
+COPY package.json vite.config.js tailwind.config.js ./
+COPY resources ./resources
+
+# Génère les fichiers dans /var/www/public/build
+RUN npm install && npm run build
+
+# Étape 2 : Builder les dépendances PHP (Composer)
+FROM composer:2 AS composer-builder
+
+WORKDIR /var/www
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
+
+# Étape 3 : Image finale (PHP-FPM + Nginx)
 FROM php:8.3-fpm
 
-# Installer les dépendances système (y compris libpq-dev pour PostgreSQL)
+# Installer les dépendances système
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpq-dev \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim unzip git curl \
-    libonig-dev \
-    libxml2-dev \
-    libzip-dev \
-    nginx \
-    supervisor \
+    build-essential libpq-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
+    locales zip jpegoptim optipng pngquant gifsicle vim unzip git curl \
+    libonig-dev libxml2-dev libzip-dev nginx supervisor \
     && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip \
     && rm -rf /var/lib/apt/lists/*
 
-# Installe Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Crée le dossier de travail
+# Copie les artefacts des étapes précédentes
 WORKDIR /var/www
-
-# Copie le projet Laravel
+COPY --from=composer-builder /var/www/vendor ./vendor
+COPY --from=frontend-builder /var/www/public/build ./public/build
 COPY . .
 
-# Installe les dépendances PHP via Composer
-RUN composer install --no-dev --optimize-autoloader
-
-# Donne les bons droits d'accès
+# Permissions (sécurité)
 RUN chown -R www-data:www-data /var/www \
     && find /var/www -type d -exec chmod 755 {} \; \
     && find /var/www -type f -exec chmod 644 {} \; \
-    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \
-    && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache \
+    && chgrp -R www-data storage bootstrap/cache
 
-# Supprime la configuration nginx par défaut
+# Configuration Nginx + Supervisor
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-
-# Configuration supervisord pour lancer PHP-FPM + Nginx ensemble
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Copie de entrypoint.sh dans l'image Docker
+# Entrypoint
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-
-# Rendre le script exécutable
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Expose le port HTTP
 EXPOSE 80
-
-# Utilise le script comme point d’entrée
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]
