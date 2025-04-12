@@ -7,6 +7,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/asset-page', function () {
+    return view('asset');
+});
+
 Route::get('/portfolio', function () {
     return view('portfolio');
 });
