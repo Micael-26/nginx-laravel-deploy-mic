@@ -58,6 +58,11 @@ RUN chown -R www-data:www-data /var/www && \
 # 7. Découverte des packages Laravel
 RUN php artisan package:discover
 
+# Configuration finale
+RUN mkdir -p /etc/supervisor/conf.d && \
+    mkdir -p /var/log/supervisor && \
+    ln -s /etc/supervisor/supervisord.conf /etc/supervisord.conf
+    
 # 8. Configuration serveur
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisor/supervisord.conf
