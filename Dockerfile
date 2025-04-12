@@ -25,7 +25,9 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Installer les dépendances JS et builder les assets avec Vite
-RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi && npm run build
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+RUN npm run build
 
 ### 🧱 Étape 2 : Image finale pour exécution ###
 FROM php:8.3-fpm as runtime-stage
