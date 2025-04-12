@@ -1,69 +1,57 @@
-# ========== ÉTAPE DE BUILD ==========
-FROM node:20 AS frontend-builder
+FROM php:8.3-fpm
 
-WORKDIR /app
-
-# 1. Copier les fichiers de dépendances (gère l'absence de package-lock.json)
-COPY package.json .
-COPY package-lock.json* ./
-
-# 2. Installer les dépendances frontend (avec gestion d'erreur)
-RUN if [ -f package-lock.json ]; then \
-      npm ci --legacy-peer-deps; \
-    else \
-      npm install --legacy-peer-deps; \
-    fi \
-    && npm cache clean --force
-
-# 3. Builder les assets
-COPY resources/ ./resources/
-COPY vite.config.js ./
-RUN npm run build
-
-# ========== ÉTAPE DE PRODUCTION ==========
-FROM php:8.3-fpm-alpine
-
-# 1. Installer les dépendances système minimales
-RUN apk add --no-cache \
+# Installer les dépendances système (y compris libpq-dev pour PostgreSQL)
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    locales \
+    zip \
+    jpegoptim optipng pngquant gifsicle \
+    vim unzip git curl \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
     nginx \
     supervisor \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libzip-dev \
-    oniguruma-dev \
-    postgresql-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql mbstring exif pcntl bcmath gd zip \
+    && rm -rf /var/lib/apt/lists/*
 
-# 2. Configurer l'environnement
-WORKDIR /var/www
-ENV NODE_ENV=production
-ENV APP_ENV=production
-
-# 3. Copier les assets compilés depuis l'étape frontend
-COPY --from=frontend-builder /app/public/build/ ./public/build/
-
-# 4. Installer les dépendances PHP
+# Installe Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-COPY . .
-RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# 5. Configurer les permissions
+# Crée le dossier de travail
+WORKDIR /var/www
+
+# Copie le projet Laravel
+COPY . .
+
+# Installe les dépendances PHP via Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Donne les bons droits d'accès
 RUN chown -R www-data:www-data /var/www \
     && find /var/www -type d -exec chmod 755 {} \; \
     && find /var/www -type f -exec chmod 644 {} \; \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 /var/www/storage /var/www/bootstrap/cache \
+    && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
 
-# 6. Configurer les services
-COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY docker/supervisord.conf /etc/supervisord.conf
+# Supprime la configuration nginx par défaut
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# 7. Configurer l'entrypoint
-COPY docker/entrypoint.sh /usr/local/bin/
-RUN apk add --no-cache dos2unix \
-    && dos2unix /usr/local/bin/entrypoint.sh \
-    && chmod +x /usr/local/bin/entrypoint.sh
+# Configuration supervisord pour lancer PHP-FPM + Nginx ensemble
+COPY supervisord.conf /etc/supervisord.conf
 
+# Copie de entrypoint.sh dans l'image Docker
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Rendre le script exécutable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Expose le port HTTP
 EXPOSE 80
+
+# Utilise le script comme point d’entrée
 CMD ["sh", "/usr/local/bin/entrypoint.sh"]
