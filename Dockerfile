@@ -39,13 +39,13 @@ RUN chown -R www-data:www-data /var/www \
     && chgrp -R www-data /var/www/storage /var/www/bootstrap/cache
 
 # Supprime la configuration nginx par défaut
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Configuration supervisord pour lancer PHP-FPM + Nginx ensemble
-COPY supervisord.conf /etc/supervisord.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
 
 # Copie de entrypoint.sh dans l'image Docker
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # Rendre le script exécutable
 RUN chmod +x /usr/local/bin/entrypoint.sh
