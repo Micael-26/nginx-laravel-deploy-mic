@@ -40,7 +40,7 @@ RUN chown -R www-data:www-data /var/www \
     && find /var/www -type f -exec chmod 644 {} \; \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Supprimer conf Nginx par défaut et copier la tienne
+# Supprimer conf Nginx par défaut
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Supervisord
