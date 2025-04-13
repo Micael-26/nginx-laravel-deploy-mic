@@ -81,6 +81,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
+<<<<<<< HEAD
 
          'pgsql' => [
             'driver' => 'pgsql',
@@ -95,8 +96,18 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => 'prefer',
+=======
+    
+        'pgsql' => [
+            'driver' => 'pgsql',
+            'url' => env('DATABASE_URL'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'sslmode' => env('DB_SSLMODE', 'require'), // 'require' recommandé sur Render
+>>>>>>> adf2116481899979546e953803dcb145df5813e7
         ],
-
+    
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),
