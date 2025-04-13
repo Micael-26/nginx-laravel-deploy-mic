@@ -82,14 +82,7 @@ return [
             ]) : [],
         ],
 
-        'pgsql' => env('APP_ENV') === 'production' ? [
-            'driver' => 'pgsql',
-            'url' => env('DATABASE_URL'),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'prefix_indexes' => true,
-            'sslmode' => env('DB_SSLMODE', 'require'), // 'require' recommandé sur Render
-        ] : [
+         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', 'localhost'),
