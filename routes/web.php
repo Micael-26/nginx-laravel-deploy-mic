@@ -50,3 +50,13 @@ Route::get('/env-info', function () {
         'app_url'  => env('APP_URL'),
     ]);
 });
+
+Route::middleware([
+    'auth:sanctum',
+    config('jetstream.auth_session'),
+    'verified',
+])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
+});
