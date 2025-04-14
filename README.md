@@ -45,8 +45,6 @@ Le projet utilise Render comme fournisseur cloud pour exécuter l’application 
 - ✔️ Compilation des assets frontend OK
 - ✔️ Affichage des routes dynamiques OK
 - ✔️ Authentification/inscription OK
-- ✔️ Envoi d’emails de test via Mailtrap OK (si activé)
-- ✔️ Affichage d’un dashboard dynamique OK
 
 ---
 
