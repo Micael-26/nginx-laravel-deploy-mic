@@ -6,6 +6,9 @@ php artisan migrate --force || true
 # Discover packages (nécessaire si on a utilisé --no-scripts dans le Dockerfile)
 php artisan package:discover --ansi
 
+# Livewire (publication des assets)
+php artisan livewire:publish --assets
+
 # Cache Laravel
 php artisan config:cache
 php artisan route:cache
