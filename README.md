@@ -2,65 +2,52 @@
   Déploiement de l'application Laravel 12 sur Render via Docker
 </h1>
 
-Je suis heureux d’annoncer que le déploiement de mon application Laravel a été effectué avec succès sur la plateforme **Render** en utilisant **Docker**. Cette mise en production marque une étape clé dans le cycle de développement et confirme que l’environnement de production est prêt pour démarrer en ligne.
+[![Live Deployment](https://img.shields.io/badge/LIVE_DEMO-▶_laravel--docker--deploy.onrender.com-46E3B7?style=for-the-badge)](https://laravel-docker-deploy.onrender.com)
 
----
+## 🚀 Stack utilisée
 
-## Stack utilisée
-
-- **Laravel** (backend PHP)
+- **Laravel 12** (backend PHP)
+- **Jetstream** (authentification)
+- **Livewire** (composants dynamiques)
 - **PostgreSQL** (base de données)
 - **Docker** (conteneurisation)
 - **Render** (hébergement cloud)
-  
----
-
-## Environnement de production
-
-Le projet utilise Render comme fournisseur cloud pour exécuter l’application Laravel dans un environnement conteneurisé. Toutes les **variables d’environnement** sont gérées de manière sécurisée via le dashboard Render, ce qui permet de s’affranchir du fichier `.env` traditionnel.
-
-### ✅ Fonctionnalités actives en production :
-
-- Connexion à la base PostgreSQL via l’URL `DATABASE_URL`
-- Mode production activé (`APP_ENV=production`)
-- Configuration sécurisée avec `DB_SSLMODE=require`
-- Serveur Docker opérationnel et monitoré
-- Routage Laravel pleinement fonctionnel
-- Pages dynamiques et formulaire de contact testés avec succès
 
 ---
 
-## Sécurité et bonnes pratiques
+## 🔒 Tests d'authentification réussis (Jetstream + Livewire)
 
-- Le fichier `.env` est exclu du dépôt (`.gitignore`) et non utilisé en production
-- Les identifiants sensibles sont fournis par les variables Render
-- Une route sécurisée permet de vérifier les variables actives via un token
-- Les accès à l'interface sont protégés contre l’exposition publique d’informations critiques
+### ✅ Fonctionnalités vérifiées
 
----
+1. **Inscription utilisateur**
+   - Création de compte avec validation email
+   - Hachage sécurisé des mots de passe
+   - Redirection vers le dashboard après inscription
 
-## 🧪 Tests et vérifications
+2. **Connexion/Déconnexion**
+   - Authentification via email/mot de passe
+   - Gestion des sessions actives
+   - Déconnexion sécurisée
 
-- ✔️ Connexion à la base de données OK
-- ✔️ Compilation des assets frontend OK
-- ✔️ Affichage des routes dynamiques OK
-- ✔️ Authentification/inscription OK
+3. **Protection des routes**
+   - Accès restreint au dashboard pour utilisateurs non authentifiés
+   - Middleware `auth` fonctionnel sur les routes protégées
 
----
+4. **Profil utilisateur**
+   - Mise à jour des informations du profil
+   - Changement de mot de passe sécurisé
+   - Suppression de compte
 
-## Prochaines étapes
+### 🧪 Tests effectués
 
-- Intégration continue via GitHub Actions
-- Ajout d’un système de logs et monitoring
-- Déploiement d’une version staging pour tests utilisateurs
-- Intégration WebSockets pour fonctionnalités temps réel
+| Fonctionnalité       | Méthode de test          | Résultat |
+|----------------------|--------------------------|----------|
+| Inscription          | Formulaire Livewire      | ✅       |
+| Connexion            | Session persistante      | ✅       |
+| Mot de passe oublié  | Lien de réinitialisation | ✅       |
+| Dashboard protégé   | Accès non authentifié    | ❌ (Bloqué) |
 
----
+### 📸 Captures d'écran
 
-## Accès
-
-[![Live Deployment](https://img.shields.io/badge/LIVE_DEMO-▶_laravel--docker--deploy.onrender.com-46E3B7?style=for-the-badge)](https://laravel-docker-deploy.onrender.com)
-
-Merci d’avoir suivi cette évolution jusqu’en production !
-
----
+![Authentification réussie](https://via.placeholder.com/600x400?text=Login+Screen+with+Livewire)
+*Interface d'authentification Livewire*
