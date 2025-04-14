@@ -49,5 +49,5 @@
 
 ### 📸 Captures d'écran
 
-![Authentification réussie](https://via.placeholder.com/600x400?text=Login+Screen+with+Livewire)
+![Authentification réussie](https://github.com/user-attachments/assets/dba5e88c-8109-442b-9646-1a532f88c250)
 *Interface d'authentification Livewire*
