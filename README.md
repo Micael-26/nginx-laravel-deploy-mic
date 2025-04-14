@@ -4,7 +4,7 @@
 
 [![Live Deployment](https://img.shields.io/badge/LIVE_DEMO-▶_laravel--docker--deploy.onrender.com-46E3B7?style=for-the-badge)](https://laravel-docker-deploy.onrender.com)
 
-## 🚀 Stack utilisée
+## Stack utilisée
 
 - **Laravel 12** (backend PHP)
 - **Jetstream** (authentification)
@@ -15,7 +15,7 @@
 
 ---
 
-## 🔒 Tests d'authentification réussis (Jetstream + Livewire)
+## Tests d'authentification réussis (Jetstream + Livewire)
 
 ### ✅ Fonctionnalités vérifiées
 
@@ -38,7 +38,7 @@
    - Changement de mot de passe sécurisé
    - Suppression de compte
 
-### 🧪 Tests effectués
+### Tests effectués
 
 | Fonctionnalité       | Méthode de test          | Résultat |
 |----------------------|--------------------------|----------|
@@ -47,7 +47,7 @@
 | Mot de passe oublié  | Lien de réinitialisation | ✅       |
 | Dashboard protégé   | Accès non authentifié    | ❌ (Bloqué) |
 
-### 📸 Captures d'écran
+### Captures d'écran
 
 ![Authentification réussie](https://github.com/user-attachments/assets/dba5e88c-8109-442b-9646-1a532f88c250)
-*Interface d'authentification Livewire*
+*Interface d'authentification Laravel Jetstream*
